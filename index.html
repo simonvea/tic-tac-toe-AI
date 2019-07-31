@@ -151,8 +151,10 @@
     return a === b && a === c && a !== ''
   }
 
-  function play() {
+  function play(initial) {
     setUp();
+    currentPlayer = 'X';
+    nextTurn(initial, currentPlayer);
     const play = setInterval(()=> {
       if(win) {
         clearInterval(play)
