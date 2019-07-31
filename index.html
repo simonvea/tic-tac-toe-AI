@@ -5,69 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Tic Tac Toe - Minimaxed </title>
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-  <canvas id="tictactoe"></canvas>
-  <button onclick="setUp()">Restart</button>
-  <button onclick="nextTurn(null, 'X')">Jeg vil være O!</button>
+  <main class="container">
+      <div id="winner"> </div>
+    <canvas id="tictactoe"></canvas>
+    <div class="container">
+      <button id="restart">Restart</button>
+      <button id="comp-middle" >Jeg vil la computer starte i midten! (vanskelig)</button>
+      <button id="comp-random" >Jeg vil la computer starte på et tilfeldig sted!</button>
+    </div>
 
-
-  <div id="winner" style="font-size: 40px">
+  </main>
 
   </div>
   <script src="minmax.js"></script>
   <script>
     const canvas = document.getElementById('tictactoe');
-    canvas.addEventListener('click', ({clientX, clientY}) => {
-      if(win){return}
-      if(playerOne === '') {
-        playerOne = currentPlayer;
-        playerTwo = playerOne === 'X'? 'O' : 'X';
-      }
-      if(playerOne !== currentPlayer) return;
-      let clicked  = false;
-      if(clientX < w) {
-        if(clientY < h) {
-          nextTurn([0,0], playerOne)
-          clicked = true;
-        } else if (clientY < h *2) {
-          nextTurn([1,0], playerOne)
-          clicked = true;
-        } else if (clientY < CANVAS_HEIGHT) {
-          nextTurn([2,0], playerOne)
-          clicked = true;
-        }
-      } else if(clientX < w * 2) {
-        if(clientY < h) {
-          nextTurn([0,1], playerOne)
-          clicked = true;
-        } else if (clientY < h *2) {
-          nextTurn([1,1], playerOne)
-          clicked = true;
-        } else if (clientY < CANVAS_HEIGHT) {
-          nextTurn([2,1], playerOne)
-          clicked = true;
-        }
-      } else if (clientX < CANVAS_WIDTH) {
-        if(clientY < h) {
-          nextTurn([0,2], playerOne)
-          clicked = true;
-        } else if (clientY < h *2) {
-          nextTurn([1,2], playerOne)
-          clicked = true;
-        } else if (clientY < CANVAS_HEIGHT) {
-          nextTurn([2,2], playerOne)
-          clicked = true;
-        }
-      }
-      if(clicked){
-        setTimeout(()=>nextAITurn(playerTwo),200)
-      }
-    });
+    const restartBtn = document.getElementById('restart');
+    const compBtnMid = document.getElementById('comp-middle');
+    const compBtnRand = document.getElementById('comp-random');
+
     const ctx = canvas.getContext('2d');
     const winnerDiv = document.getElementById('winner');
-    const CANVAS_WIDTH = 600;
-    const CANVAS_HEIGHT = 600;
+    const CANVAS_WIDTH = 300;
+    const CANVAS_HEIGHT = 300;
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
@@ -103,6 +66,8 @@
     winnerDiv.innerHTML = '';
     win = false;
 
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = 'black';
     ctx.beginPath();
     ctx.moveTo(w, 0);
@@ -197,12 +162,75 @@
     }, 1000)
   }
 
-
-
   function nextAITurn(player) {
     if(player !== currentPlayer) return
     const spot = pickAIMove(playArea, available, player)
     nextTurn(spot[0], player)
+  }
+
+  restartBtn.addEventListener('click', setUp);
+  compBtnMid.addEventListener('click',() => {
+    setUp();
+    nextTurn([1,1], 'X');
+  })
+  compBtnRand.addEventListener('click', ()=> {
+    setUp();
+    nextTurn(null, 'X');
+  })
+
+  canvas.addEventListener('click', handleClick);
+  // canvas.addEventListener('touchstart',(e) => {
+  //   console.log(e);
+  // },false)
+
+  function handleClick(e) {
+    e.preventDefault();
+  
+    let {offsetX, offsetY} = e;
+    if(win){return}
+    if(playerOne === '') {
+      playerOne = currentPlayer;
+      playerTwo = playerOne === 'X'? 'O' : 'X';
+    }
+    if(playerOne !== currentPlayer) return;
+    let clicked  = false;
+    if(offsetX < w) {
+      if(offsetY < h) {
+        nextTurn([0,0], playerOne)
+        clicked = true;
+      } else if (offsetY < h *2) {
+        nextTurn([1,0], playerOne)
+        clicked = true;
+      } else if (offsetY < CANVAS_HEIGHT) {
+        nextTurn([2,0], playerOne)
+        clicked = true;
+      }
+    } else if(offsetX < w * 2) {
+      if(offsetY < h) {
+        nextTurn([0,1], playerOne)
+        clicked = true;
+      } else if (offsetY < h *2) {
+        nextTurn([1,1], playerOne)
+        clicked = true;
+      } else if (offsetY < CANVAS_HEIGHT) {
+        nextTurn([2,1], playerOne)
+        clicked = true;
+      }
+    } else if (offsetX < CANVAS_WIDTH) {
+      if(offsetY < h) {
+        nextTurn([0,2], playerOne)
+        clicked = true;
+      } else if (offsetY < h *2) {
+        nextTurn([1,2], playerOne)
+        clicked = true;
+      } else if (offsetY < CANVAS_HEIGHT) {
+        nextTurn([2,2], playerOne)
+        clicked = true;
+      }
+    }
+    if(clicked){
+      setTimeout(()=>nextAITurn(playerTwo),200)
+    }
   }
   
   </script>
