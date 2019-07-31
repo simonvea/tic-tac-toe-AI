@@ -19,6 +19,7 @@
   <script>
     const canvas = document.getElementById('tictactoe');
     canvas.addEventListener('click', ({clientX, clientY}) => {
+      if(win){return}
       let clicked  = false;
       if(clientX < w) {
         if(clientY < h) {
@@ -79,6 +80,7 @@
     ]
 
     let available = [];
+    let win = false;
 
   setUp();
 
@@ -92,6 +94,7 @@
     ]
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     winnerDiv.innerHTML = '';
+    win = false;
 
     ctx.strokeStyle = 'black';
     ctx.beginPath();
@@ -125,7 +128,7 @@
     playArea[i][j] = player || currentPlayer;
     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
     placeText();
-    let win = winner(playArea, available)
+    win = winner(playArea, available)
     if(win) {
       if(win === 'draw') {
         winnerDiv.innerHTML = 'Uavgjort!'
@@ -176,7 +179,7 @@
   function play() {
     setUp();
     const play = setInterval(()=> {
-      if(winner(playArea, available)) {
+      if(winner) {
         clearInterval(play)
       } else {
         nextAITurn(currentPlayer);
