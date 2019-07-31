@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <canvas id="tictactoe"></canvas>
+  <button onclick="setUp()">Restart</button>
+  <button onclick="nextTurn()">Jeg vil være O!</button>
+
+
+  <div id="winner" style="font-size: 40px">
+
+  </div>
+  <script src="minmax.js"></script>
+  <script>
+    const canvas = document.getElementById('tictactoe');
+    canvas.addEventListener('click', ({clientX, clientY}) => {
+      let clicked  = false;
+      if(clientX < w) {
+        if(clientY < h) {
+          nextTurn([0,0])
+          clicked = true;
+        } else if (clientY < h *2) {
+          nextTurn([1,0])
+          clicked = true;
+        } else if (clientY < CANVAS_HEIGHT) {
+          nextTurn([2,0])
+          clicked = true;
+        }
+      } else if(clientX < w * 2) {
+        if(clientY < h) {
+          nextTurn([0,1])
+          clicked = true;
+        } else if (clientY < h *2) {
+          nextTurn([1,1])
+          clicked = true;
+        } else if (clientY < CANVAS_HEIGHT) {
+          nextTurn([2,1])
+          clicked = true;
+        }
+      } else if (clientX < CANVAS_WIDTH) {
+        if(clientY < h) {
+          nextTurn([0,2])
+          clicked = true;
+        } else if (clientY < h *2) {
+          nextTurn([1,2])
+          clicked = true;
+        } else if (clientY < CANVAS_HEIGHT) {
+          nextTurn([2,2])
+          clicked = true;
+        }
+      }
+      if(clicked){
+        console.log('AI tenker');
+        setTimeout(()=>nextAITurn(currentPlayer),200)
+      }
+    });
+    const ctx = canvas.getContext('2d');
+    const winnerDiv = document.getElementById('winner');
+    const CANVAS_WIDTH = 600;
+    const CANVAS_HEIGHT = 600;
+    canvas.width = CANVAS_WIDTH;
+    canvas.height = CANVAS_HEIGHT;
+
+    const w = CANVAS_WIDTH / 3;
+    const h = CANVAS_HEIGHT / 3;
+
+    const players = ['X', 'O'];
+    let currentPlayer = 'X';
+
+    let playArea = [
+      ['','',''],
+      ['','',''],
+      ['','','']
+    ]
+
+    let available = [];
+
+  setUp();
+
+  function setUp() {
+    currentPlayer = 'X';
+    available = [];
+    playArea = [
+      ['','',''],
+      ['','',''],
+      ['','','']
+    ]
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    winnerDiv.innerHTML = '';
+
+    ctx.strokeStyle = 'black';
+    ctx.beginPath();
+    ctx.moveTo(w, 0);
+    ctx.lineTo(w, CANVAS_HEIGHT)
+    ctx.moveTo(w*2, 0);
+    ctx.lineTo(w*2, CANVAS_HEIGHT);
+    ctx.moveTo(0, h);
+    ctx.lineTo(CANVAS_WIDTH, h);
+    ctx.moveTo(0, h*2);
+    ctx.lineTo(CANVAS_WIDTH, h*2);
+    ctx.stroke();
+
+    for(let i = 0; i < 3; i++) {
+      for(let j = 0; j <3; j++) {
+        available.push([i,j])
+      }
+    }
+
+  }
+
+  function nextTurn(spot, player) {
+    if(available.length <1) return
+    if(!spot) {
+      const index = Math.floor(Math.random() * available.length)
+      spot = available.splice(index,1)[0];
+    } 
+    const i = spot[0];
+    const j = spot[1];
+    available = available.filter(el => !(el[0] === i && el[1] === j))
+    playArea[i][j] = player || currentPlayer;
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    placeText();
+    let win = winner(playArea, available)
+    if(win) {
+      if(win === 'draw') {
+        winnerDiv.innerHTML = 'Uavgjort!'
+      } else {
+        winnerDiv.innerHTML = `${win} vant!`
+      }
+    };
+  }
+
+  function placeText() {
+    ctx.font = `${CANVAS_HEIGHT/4}px Comic Sans MS`;
+    ctx.fillStyle = "black";
+    ctx.textAlign = "center";
+
+    for(let i = 0; i < 3; i++) {
+      for(let j = 0; j <3; j++) {
+        let x = (j*2 + 1) * w;
+        let y = (i + 1) * h - h/4;
+        ctx.fillText(playArea[i][j], x/2, y);
+      }
+    }
+  }
+
+  function winner(playArea, available) {
+    //horizontal
+    for(let i = 0; i < 3; i++) {
+      if(isEqual(playArea[i][0],playArea[i][1],playArea[i][2])){
+        return playArea[i][0];
+      } 
+    }
+    //vertical
+    for(let i = 0; i < 3; i++) {
+      if(isEqual(playArea[0][i],playArea[1][i],playArea[2][i])) {
+        return playArea[0][i];
+      }
+    }
+    //diagonal
+    if(isEqual(playArea[0][0], playArea[1][1], playArea[2][2])) return playArea[0][0];
+    if(isEqual(playArea[2][0], playArea[1][1], playArea[0][2])) return playArea[2][0];
+
+    if(available.length < 1) return 'draw';
+  }
+
+  function isEqual(a, b, c) {
+    return a === b && a === c && a !== ''
+  }
+
+  function play() {
+    setUp();
+    const play = setInterval(()=> {
+      if(winner(playArea, available)) {
+        clearInterval(play)
+      } else {
+        nextAITurn(currentPlayer);
+      }
+    }, 1000)
+  }
+
+
+
+  function nextAITurn(player) {
+    const spot = pickAIMove(playArea, available, player)
+    console.log(spot);
+    nextTurn(spot[0], player)
+  }
+  
+  </script>
+</body>
+</html>
