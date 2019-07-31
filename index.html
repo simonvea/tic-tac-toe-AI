@@ -9,7 +9,7 @@
 <body>
   <canvas id="tictactoe"></canvas>
   <button onclick="setUp()">Restart</button>
-  <button onclick="nextTurn()">Jeg vil være O!</button>
+  <button onclick="nextTurn(null, 'X')">Jeg vil være O!</button>
 
 
   <div id="winner" style="font-size: 40px">
@@ -61,7 +61,6 @@
         }
       }
       if(clicked){
-        console.log('AI tenker');
         setTimeout(()=>nextAITurn(playerTwo),200)
       }
     });
