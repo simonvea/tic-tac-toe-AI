@@ -154,7 +154,7 @@
   function play() {
     setUp();
     const play = setInterval(()=> {
-      if(winner) {
+      if(win) {
         clearInterval(play)
       } else {
         nextAITurn(currentPlayer);
